@@ -5,7 +5,7 @@ using refactor_this.Models;
 
 namespace refactor_this.Controllers
 {
-    [RoutePrefix("/api/products")]
+    [RoutePrefix("api/products")]
     public class ProductsController : ApiController
     {
         [Route]
