@@ -11,29 +11,55 @@ namespace refactor_this.Models
 
         public Products()
         {
-            LoadProducts(null);
+            LoadProducts();
         }
 
         public Products(string name)
         {
-            LoadProducts($"where lower(name) like '%{name.ToLower()}%'");
+            LoadProduct(name);
         }
 
-        private void LoadProducts(string whereClause)
+        private void LoadProducts()
         {
+
             Items = new List<Product>();
 
             using (var conn = Helpers.NewConnection())
             {
-                // ToDo: whereClause null then error?
-                string sql = whereClause == null ? "select id from product" : "select id from product where lower(name) like @Name";
+                string sql = "select id from product";
 
                 using (var cmd = new SqlCommand(sql, conn))
                 {
-                    if (whereClause != null)
+                    conn.Open();
+
+                    using (var rdr = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddWithValue("@Name", $"%{whereClause.ToLower()}%");
+                        while (rdr.Read())
+                        {
+                            var id = Guid.Parse(rdr["id"].ToString());
+
+                            Items.Add(new Product(id));
+                        }
                     }
+                }
+            }
+        }
+
+        private void LoadProduct(string name)
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+
+            var lowerCaseName = name?.ToLower();
+
+            Items = new List<Product>();
+
+            using (var conn = Helpers.NewConnection())
+            {
+                string sql = "select id from product where lower(name) like @Name";
+
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Name", lowerCaseName);
 
                     conn.Open();
 
@@ -42,6 +68,7 @@ namespace refactor_this.Models
                         while (rdr.Read())
                         {
                             var id = Guid.Parse(rdr["id"].ToString());
+
                             Items.Add(new Product(id));
                         }
                     }
@@ -137,15 +164,15 @@ namespace refactor_this.Models
 
         public ProductOptions()
         {
-            LoadProductOptions(null);
+            LoadProductOptions();
         }
 
         public ProductOptions(Guid productId)
         {
-            LoadProductOptions($"where productid = '{productId}'");
+            LoadProductOption(productId);
         }
 
-        private void LoadProductOptions(string whereClause)
+        private void LoadProductOptions()
         {
             Items = new List<ProductOption>();
 
@@ -153,17 +180,40 @@ namespace refactor_this.Models
             {
                 string sql = "select id from productoption";
 
-                if (!string.IsNullOrEmpty(whereClause))
+                using (var cmd = new SqlCommand(sql, conn))
                 {
-                    sql += " where productid = @ProductId";
+                    conn.Open();
+
+                    using (var rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            var id = Guid.Parse(rdr["id"].ToString());
+
+                            Items.Add(new ProductOption(id));
+                        }
+                    }
                 }
+            }
+        }
+
+        private void LoadProductOption(Guid productId)
+        {
+            var productIdAsString = productId.ToString();
+
+            if (string.IsNullOrEmpty(productIdAsString)) throw new ArgumentNullException(nameof(productIdAsString));
+                
+            Items = new List<ProductOption>();
+
+            using (var conn = Helpers.NewConnection())
+            {
+                string sql = "select id from productoption";
+
+                sql += " where productid = @ProductId";
 
                 using (var cmd = new SqlCommand(sql, conn))
                 {
-                    if (!string.IsNullOrEmpty(whereClause))
-                    {
-                        cmd.Parameters.AddWithValue("@ProductId", whereClause);
-                    }
+                    cmd.Parameters.AddWithValue("@ProductId", productIdAsString);
 
                     conn.Open();
 
@@ -172,6 +222,7 @@ namespace refactor_this.Models
                         while (rdr.Read())
                         {
                             var id = Guid.Parse(rdr["id"].ToString());
+
                             Items.Add(new ProductOption(id));
                         }
                     }
@@ -206,6 +257,7 @@ namespace refactor_this.Models
             using (var cmd = new SqlCommand("select * from productoption where id = @Id", conn))
             {
                 cmd.Parameters.AddWithValue("@Id", id);
+
                 conn.Open();
 
                 using (var rdr = cmd.ExecuteReader())
