@@ -19,19 +19,31 @@ namespace refactor_this.Models
             LoadProducts($"where lower(name) like '%{name.ToLower()}%'");
         }
 
-        private void LoadProducts(string where)
+        private void LoadProducts(string whereClause)
         {
             Items = new List<Product>();
+
             using (var conn = Helpers.NewConnection())
-            using (var cmd = new SqlCommand($"select id from product {where}", conn))
             {
-                conn.Open();
-                using (var rdr = cmd.ExecuteReader())
+                // ToDo: whereClause null then error?
+                string sql = whereClause == null ? "select id from product" : "select id from product where lower(name) like @Name";
+
+                using (var cmd = new SqlCommand(sql, conn))
                 {
-                    while (rdr.Read())
+                    if (whereClause != null)
                     {
-                        var id = Guid.Parse(rdr["id"].ToString());
-                        Items.Add(new Product(id));
+                        cmd.Parameters.AddWithValue("@Name", $"%{whereClause.ToLower()}%");
+                    }
+
+                    conn.Open();
+
+                    using (var rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            var id = Guid.Parse(rdr["id"].ToString());
+                            Items.Add(new Product(id));
+                        }
                     }
                 }
             }
@@ -62,10 +74,13 @@ namespace refactor_this.Models
         public Product(Guid id)
         {
             IsNew = true;
+
             using (var conn = Helpers.NewConnection())
-            using (var cmd = new SqlCommand($"select * from product where id = '{id}'", conn))
+            using (var cmd = new SqlCommand("select * from product where id = @Id", conn))
             {
+                cmd.Parameters.AddWithValue("@Id", id);
                 conn.Open();
+
                 using (var rdr = cmd.ExecuteReader())
                 {
                     if (!rdr.Read()) return;
@@ -83,12 +98,21 @@ namespace refactor_this.Models
         public void Save()
         {
             using (var conn = Helpers.NewConnection())
-            using (var cmd = IsNew
-                       ? new SqlCommand($"insert into product (id, name, description, price, deliveryprice) values ('{Id}', '{Name}', '{Description}', {Price}, {DeliveryPrice})", conn)
-                       : new SqlCommand($"update product set name = '{Name}', description = '{Description}', price = {Price}, deliveryprice = {DeliveryPrice} where id = '{Id}'", conn))
             {
-                conn.Open();
-                cmd.ExecuteNonQuery();
+                string sql = IsNew ?
+                    "insert into product (id, name, description, price, deliveryprice) values (@Id, @Name, @Description, @Price, @DeliveryPrice)" :
+                    "update product set name = @Name, description = @Description, price = @Price, deliveryprice = @DeliveryPrice where id = @Id";
+
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", Id);
+                    cmd.Parameters.AddWithValue("@Name", Name);
+                    cmd.Parameters.AddWithValue("@Description", Description ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Price", Price);
+                    cmd.Parameters.AddWithValue("@DeliveryPrice", DeliveryPrice);
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
@@ -98,8 +122,9 @@ namespace refactor_this.Models
                 option.Delete();
 
             using (var conn = Helpers.NewConnection())
-            using (var cmd = new SqlCommand($"delete from product where id = '{Id}'", conn))
+            using (var cmd = new SqlCommand("delete from product where id = @Id", conn))
             {
+                cmd.Parameters.AddWithValue("@Id", Id);
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
@@ -120,19 +145,35 @@ namespace refactor_this.Models
             LoadProductOptions($"where productid = '{productId}'");
         }
 
-        private void LoadProductOptions(string where)
+        private void LoadProductOptions(string whereClause)
         {
             Items = new List<ProductOption>();
+
             using (var conn = Helpers.NewConnection())
-            using (var cmd = new SqlCommand($"select id from productoption {where}", conn))
             {
-                conn.Open();
-                using (var rdr = cmd.ExecuteReader())
+                string sql = "select id from productoption";
+
+                if (!string.IsNullOrEmpty(whereClause))
                 {
-                    while (rdr.Read())
+                    sql += " where productid = @ProductId";
+                }
+
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    if (!string.IsNullOrEmpty(whereClause))
                     {
-                        var id = Guid.Parse(rdr["id"].ToString());
-                        Items.Add(new ProductOption(id));
+                        cmd.Parameters.AddWithValue("@ProductId", whereClause);
+                    }
+
+                    conn.Open();
+
+                    using (var rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            var id = Guid.Parse(rdr["id"].ToString());
+                            Items.Add(new ProductOption(id));
+                        }
                     }
                 }
             }
@@ -162,9 +203,11 @@ namespace refactor_this.Models
         {
             IsNew = true;
             using (var conn = Helpers.NewConnection())
-            using (var cmd = new SqlCommand($"select * from productoption where id = '{id}'", conn))
+            using (var cmd = new SqlCommand("select * from productoption where id = @Id", conn))
             {
+                cmd.Parameters.AddWithValue("@Id", id);
                 conn.Open();
+
                 using (var rdr = cmd.ExecuteReader())
                 {
                     if (!rdr.Read()) return;
@@ -181,22 +224,31 @@ namespace refactor_this.Models
         public void Save()
         {
             using (var conn = Helpers.NewConnection())
-            using (var cmd = IsNew ?
-                       new SqlCommand($"insert into productoption (id, productid, name, description) values ('{Id}', '{ProductId}', '{Name}', '{Description}')", conn) :
-                       new SqlCommand($"update productoption set name = '{Name}', description = '{Description}' where id = '{Id}'", conn))
             {
-                conn.Open();
-                cmd.ExecuteNonQuery();
+                string sql = IsNew ?
+                    "insert into productoption (id, productid, name, description) values (@Id, @ProductId, @Name, @Description)" :
+                    "update productoption set name = @Name, description = @Description where id = @Id";
+
+                using (var cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", Id);
+                    cmd.Parameters.AddWithValue("@ProductId", ProductId);
+                    cmd.Parameters.AddWithValue("@Name", Name);
+                    cmd.Parameters.AddWithValue("@Description", Description ?? (object)DBNull.Value);
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
         public void Delete()
         {
             using (var conn = Helpers.NewConnection())
-            using (var cmd = new SqlCommand($"delete from productoption where id = '{Id}'", conn))
+            using (var cmd = new SqlCommand("delete from productoption where id = @Id", conn))
             {
+                cmd.Parameters.AddWithValue("@Id", Id);
                 conn.Open();
-                cmd.ExecuteNonQuery(); 
+                cmd.ExecuteNonQuery();
             }
         }
     }
