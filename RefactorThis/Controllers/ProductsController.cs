@@ -2,31 +2,40 @@
 using System.Net;
 using System.Web.Http;
 using refactor_this.Models;
+using refactor_this.Services;
 
 namespace refactor_this.Controllers
 {
     [RoutePrefix("api/products")]
     public class ProductsController : ApiController
     {
+        private readonly IProductService _productService;
+
+        public ProductsController(IProductService productService)
+        {
+            _productService = productService;
+        }
+
         [Route]
         [HttpGet]
         public Products GetAll()
         {
-            return new Products();
+            return _productService.GetAllProducts();
         }
 
         [Route]
         [HttpGet]
         public Products SearchByName(string name)
         {
-            return new Products(name);
+            return _productService.GetProductsByName(name);
         }
 
         [Route("{id}")]
         [HttpGet]
         public Product GetProduct(Guid id)
         {
-            var product = new Product(id);
+            var product = _productService.GetProductById(id);
+
             if (product.IsNew)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
@@ -37,7 +46,7 @@ namespace refactor_this.Controllers
         [HttpPost]
         public void Create(Product product)
         {
-            product.Save();
+            _productService.SaveProduct(product);
         }
 
         [Route("{id}")]
@@ -53,15 +62,14 @@ namespace refactor_this.Controllers
             };
 
             if (!orig.IsNew)
-                orig.Save();
+                _productService.SaveProduct(orig);
         }
 
         [Route("{id}")]
         [HttpDelete]
         public void Delete(Guid id)
         {
-            var product = new Product(id);
-            product.Delete();
+            _productService.DeleteProduct(id);
         }
 
         [Route("{productId}/options")]

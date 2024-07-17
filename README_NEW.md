@@ -14,3 +14,10 @@
 
 ## Fourth commit
 - Added extra methods for LoadProductOption and LoadProduct to avoid passing in where clauses and reducing code complexity. This came at the cost of code duplication but resulted in better readabiltiy
+
+## Fifth commit
+- Added a service layer with dependency injection using Unity to achieve IoC
+- For now starting with a basic implementation of the GetAll method from Products
+- Used RegisterType rather than RegisterSingleton for now as the application is not yet thread safe
+- Used the new ProductService as an intermediary layer between the controller and database
+- For now omitting a ProductOptionService and Product/Options Repositories (coming in later commits)

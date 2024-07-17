@@ -16,7 +16,7 @@ namespace refactor_this.Models
 
         public Products(string name)
         {
-            LoadProduct(name);
+            LoadProductsByName(name);
         }
 
         private void LoadProducts()
@@ -45,7 +45,7 @@ namespace refactor_this.Models
             }
         }
 
-        private void LoadProduct(string name)
+        private void LoadProductsByName(string name)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
 
@@ -102,10 +102,11 @@ namespace refactor_this.Models
         {
             IsNew = true;
 
-            using (var conn = Helpers.NewConnection())
+            using (var conn = Helpers.NewConnection())        
             using (var cmd = new SqlCommand("select * from product where id = @Id", conn))
             {
                 cmd.Parameters.AddWithValue("@Id", id);
+
                 conn.Open();
 
                 using (var rdr = cmd.ExecuteReader())
