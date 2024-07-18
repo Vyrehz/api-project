@@ -20,9 +20,9 @@ namespace refactor_this.Services
             return _productOptionRepository.GetAllByProductId(productId);
         }
 
-        public ProductOption GetProductOptionById(Guid id)
+        public ProductOption GetProductOptionById(Guid productId, Guid id)
         {
-            return _productOptionRepository.GetById(id);
+            return _productOptionRepository.GetById(productId, id);
         }
 
         public void SaveProductOption(ProductOption productOption)
@@ -37,9 +37,9 @@ namespace refactor_this.Services
             }
         }
 
-        public void DeleteProductOption(Guid id)
+        public void DeleteProductOption(Guid productId, Guid id)
         {
-            var opt = _productOptionRepository.GetById(id);
+            var opt = _productOptionRepository.GetById(productId, id);
 
             if (opt == null)
             {

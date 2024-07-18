@@ -40,6 +40,11 @@
 - Allows greater visibility for any SQL errors that occur (through the use of logging)
 - Also added null argument checks for all functions with non-GUID arguments
 
+## Tenth commit
+- Simplified SQL query for getting all products and all productOptions by id
+- Replaced SELECT id with SELECT * and then set values accordingly
+- This removed multiple extra calls to getById
+
 // ToDo: add list of sql commands to read from (Enum like)
 // ensure endpoints do as expected
 // make sql calls more efficient

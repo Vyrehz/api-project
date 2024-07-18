@@ -8,10 +8,10 @@ namespace refactor_this.Services
     {
         IEnumerable<ProductOption> GetAllProductOptionsById(Guid productId);
 
-        ProductOption GetProductOptionById(Guid id);
+        ProductOption GetProductOptionById(Guid productId, Guid id);
 
         void SaveProductOption(ProductOption productOption);
 
-        void DeleteProductOption(Guid id);
+        void DeleteProductOption(Guid productId, Guid id);
     }
 }

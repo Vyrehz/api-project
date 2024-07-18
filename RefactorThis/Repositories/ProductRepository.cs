@@ -3,7 +3,6 @@ using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using refactor_this.Exceptions;
-using System.Xml.Linq;
 
 namespace refactor_this.Repositories
 {
@@ -11,35 +10,35 @@ namespace refactor_this.Repositories
     {
         public IEnumerable<Product> GetAll()
         {
+            var items = new List<Product>();
+
             try
             {
-                var items = new List<Product>();
-
                 using (var conn = Helpers.NewConnection())
                 {
-                    string sql = "select id from product";
+                    string sql = "SELECT * FROM product"; // Fetch all details in a single query
 
                     using (var cmd = new SqlCommand(sql, conn))
                     {
                         conn.Open();
-
                         using (var rdr = cmd.ExecuteReader())
                         {
                             while (rdr.Read())
                             {
-                                // ToDo: cleanup
-                                var id = Guid.Parse(rdr["id"].ToString());
-                                var product = GetById(id);
-
+                                var product = new Product
+                                {
+                                    IsNew = false,
+                                    Id = Guid.Parse(rdr["Id"].ToString()),
+                                    Name = rdr["Name"].ToString(),
+                                    Description = (DBNull.Value == rdr["Description"]) ? null : rdr["Description"].ToString(),
+                                    Price = decimal.Parse(rdr["Price"].ToString()),
+                                    DeliveryPrice = decimal.Parse(rdr["DeliveryPrice"].ToString())
+                                };
                                 items.Add(product);
                             }
                         }
-
-                        conn.Close();
                     }
                 }
-
-                return items;
             }
             catch (SqlException ex)
             {
@@ -54,6 +53,8 @@ namespace refactor_this.Repositories
 
                 throw new RepositoryException($"An unexpected error occurred while getting all Products.", ex);
             }
+
+            return items;
         }
 
         public IEnumerable<Product> GetByName(string name)
@@ -62,13 +63,13 @@ namespace refactor_this.Repositories
             {
                 if (name == null) throw new ArgumentNullException(nameof(name));
 
-                var lowerCaseName = name?.ToLower();
+                var lowerCaseName = name.ToLower();
 
                 var items = new List<Product>();
 
                 using (var conn = Helpers.NewConnection())
                 {
-                    string sql = "select id from product where lower(name) like @Name";
+                    string sql = "SELECT id FROM product WHERE lower(name) LIKE @Name";
 
                     using (var cmd = new SqlCommand(sql, conn))
                     {
@@ -210,15 +211,15 @@ namespace refactor_this.Repositories
             catch (SqlException ex)
             {
                 // I would use a logger if this was an application deployed on AWS or GCP
-                Console.WriteLine($"SQL Error: {ex.Message} while updating Product: {product.Id}.");
+                Console.WriteLine($"SQL Error: {ex.Message} while updating Product: {product?.Id}.");
 
-                throw new RepositoryException($"An SQL error occurred while updating Product: {product.Id}.", ex);
+                throw new RepositoryException($"An SQL error occurred while updating Product: {product?.Id}.", ex);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
 
-                throw new RepositoryException($"An unexpected error occurred while updating Product: {product.Id}.", ex);
+                throw new RepositoryException($"An unexpected error occurred while updating Product: {product?.Id}.", ex);
             }
         }
 

@@ -91,8 +91,7 @@ namespace refactor_this.Controllers
         [HttpGet]
         public ProductOption GetOption(Guid productId, Guid id)
         {
-            // ToDo: productId is not used in the method
-            var option = _productOptionService.GetProductOptionById(id);
+            var option = _productOptionService.GetProductOptionById(productId, id);
 
             if (option.IsNew)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -111,10 +110,9 @@ namespace refactor_this.Controllers
 
         [Route("{productId}/options/{id}")]
         [HttpPut]
-        public void UpdateOption(Guid id, ProductOption option)
+        public void UpdateOption(Guid productId, Guid id, ProductOption option)
         {
-            // ToDo: cleanup
-            var orig = _productOptionService.GetProductOptionById(id);
+            var orig = _productOptionService.GetProductOptionById(productId, id);
 
             if (orig == null)
             {
@@ -130,9 +128,9 @@ namespace refactor_this.Controllers
 
         [Route("{productId}/options/{id}")]
         [HttpDelete]
-        public void DeleteOption(Guid id)
+        public void DeleteOption(Guid productId, Guid id)
         {
-            _productOptionService.DeleteProductOption(id);
+            _productOptionService.DeleteProductOption(productId, id);
         }
     }
 }
