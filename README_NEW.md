@@ -35,8 +35,12 @@
 - Removed Products and ProductOptions classes and replaced with Enumerables
 - Use Repositories in both Services
 
-// ToDo: add a repository layer
-// add list of sql commands to read from (Enum like)
+## Ninth commit
+- Added error handling for both repositories
+- Allows greater visibility for any SQL errors that occur (through the use of logging)
+- Also added null argument checks for all functions with non-GUID arguments
+
+// ToDo: add list of sql commands to read from (Enum like)
 // ensure endpoints do as expected
 // make sql calls more efficient
 // security

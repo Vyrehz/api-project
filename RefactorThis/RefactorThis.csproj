@@ -127,6 +127,7 @@
     <Compile Include="Repositories\IProductRepository.cs" />
     <Compile Include="Repositories\ProductOptionRepository.cs" />
     <Compile Include="Repositories\ProductRepository.cs" />
+    <Compile Include="Exceptions\RepositoryException.cs" />
     <Compile Include="Services\IProductOptionService.cs" />
     <Compile Include="Services\IProductService.cs" />
     <Compile Include="Services\ProductOptionService.cs" />
