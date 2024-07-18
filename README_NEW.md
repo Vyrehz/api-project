@@ -44,8 +44,11 @@
 - Simplified SQL query for getting all products and all productOptions by id
 - Replaced SELECT id with SELECT * and then set values accordingly
 - This removed multiple extra calls to getById
+- Also ensured the option get queries reference the productId
 
-// ToDo: add list of sql commands to read from (Enum like)
-// ensure endpoints do as expected
-// make sql calls more efficient
-// security
+## Eleventh commit
+- Added ApiKeyAuthentication
+- In future this could be extended for generated API keys but for now I have hardcoded a test key directly into the check function
+- This can be tested using postman and adding a Bearer token with the value: test_api_key
+
+// ToDo: tests

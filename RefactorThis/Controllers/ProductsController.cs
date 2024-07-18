@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
+using refactor_this.Authentication;
 using refactor_this.Models;
 using refactor_this.Services;
 
 namespace refactor_this.Controllers
 {
     [RoutePrefix("api/products")]
+    [ApiKeyAuthentication]
     public class ProductsController : ApiController
     {
         private readonly IProductService _productService;
