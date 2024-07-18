@@ -1,29 +1,52 @@
 using System;
+using System.Collections.Generic;
+using System.Web.Http;
 using refactor_this.Models;
+using refactor_this.Repositories;
 
 namespace refactor_this.Services
 {
     public class ProductOptionService : IProductOptionService
     {
-        public ProductOptions GetAllProductOptionsById(Guid productId)
+        private readonly IProductOptionRepository _productOptionRepository;
+
+        public ProductOptionService(IProductOptionRepository productOptionRepository)
         {
-            return new ProductOptions(productId);
+            _productOptionRepository = productOptionRepository;
+        }
+
+        public IEnumerable<ProductOption> GetAllProductOptionsById(Guid productId)
+        {
+            return _productOptionRepository.GetAllByProductId(productId);
         }
 
         public ProductOption GetProductOptionById(Guid id)
         {
-            return new ProductOption(id);
+            return _productOptionRepository.GetById(id);
         }
 
         public void SaveProductOption(ProductOption productOption)
         {
-            productOption.Save();
+            if (productOption.IsNew)
+            {
+                _productOptionRepository.Add(productOption);
+            }
+            else
+            {
+                _productOptionRepository.Update(productOption);
+            }
         }
 
         public void DeleteProductOption(Guid id)
         {
-            var opt = new ProductOption(id);
-            opt.Delete();
+            var opt = _productOptionRepository.GetById(id);
+
+            if (opt == null)
+            {
+                throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
+            }
+
+            _productOptionRepository.Delete(id);
         }
     }
 }

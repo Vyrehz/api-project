@@ -1,35 +1,57 @@
 using System;
+using System.Collections.Generic;
+using System.Web.Http;
 using refactor_this.Models;
+using refactor_this.Repositories;
 
 namespace refactor_this.Services
 {
     public class ProductService : IProductService
     {
-        public Products GetAllProducts()
+        private readonly IProductRepository _productRepository;
+
+        public ProductService(IProductRepository productRepository)
         {
-            return new Products();
+            _productRepository = productRepository;
         }
 
-        public Products GetProductsByName(string name)
+        public IEnumerable<Product> GetAllProducts()
         {
-            return new Products(name);
+            return _productRepository.GetAll();
+        }
+
+        public IEnumerable<Product> GetProductsByName(string name)
+        {
+            return _productRepository.GetByName(name);
         }
 
         public Product GetProductById(Guid id)
         {
-            return new Product(id);
+            return _productRepository.GetById(id);
         }
 
         public void SaveProduct(Product product)
         {
-            product.Save();
+            if (product.IsNew)
+            {
+                _productRepository.Add(product);
+            }
+            else
+            {
+                _productRepository.Update(product);
+            }
         }
 
         public void DeleteProduct(Guid id)
         {
-            var product = new Product(id);
+            var opt = _productRepository.GetById(id);
 
-            product.Delete();
+            if (opt == null)
+            {
+                throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
+            }
+
+            _productRepository.Delete(id);
         }
     }
 }

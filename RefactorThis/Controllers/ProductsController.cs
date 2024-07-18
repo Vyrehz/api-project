@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
 using refactor_this.Models;
@@ -20,14 +21,14 @@ namespace refactor_this.Controllers
 
         [Route]
         [HttpGet]
-        public Products GetAll()
+        public IEnumerable<Product> GetAll()
         {
             return _productService.GetAllProducts();
         }
 
         [Route]
         [HttpGet]
-        public Products SearchByName(string name)
+        public IEnumerable<Product> SearchByName(string name)
         {
             return _productService.GetProductsByName(name);
         }
@@ -55,13 +56,18 @@ namespace refactor_this.Controllers
         [HttpPut]
         public void Update(Guid id, Product product)
         {
-            var orig = new Product(id)
+            // ToDo: cleanup
+            var orig = _productService.GetProductById(id);
+
+            if (orig == null)
             {
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                DeliveryPrice = product.DeliveryPrice
-            };
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }   
+
+            orig.Name = product.Name;
+            orig.Description = product.Description;
+            orig.Price = product.Price;
+            orig.DeliveryPrice = product.DeliveryPrice;
 
             if (!orig.IsNew)
                 _productService.SaveProduct(orig);
@@ -76,7 +82,7 @@ namespace refactor_this.Controllers
 
         [Route("{productId}/options")]
         [HttpGet]
-        public ProductOptions GetOptions(Guid productId)
+        public IEnumerable<ProductOption> GetOptions(Guid productId)
         {
             return _productOptionService.GetAllProductOptionsById(productId);
         }
@@ -107,11 +113,16 @@ namespace refactor_this.Controllers
         [HttpPut]
         public void UpdateOption(Guid id, ProductOption option)
         {
-            var orig = new ProductOption(id)
+            // ToDo: cleanup
+            var orig = _productOptionService.GetProductOptionById(id);
+
+            if (orig == null)
             {
-                Name = option.Name,
-                Description = option.Description
-            };
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            orig.Name = option.Name;
+            orig.Description = option.Description;
 
             if (!orig.IsNew)
                 _productOptionService.SaveProductOption(orig);

@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using refactor_this.Models;
 
 namespace refactor_this.Services
 {
     public interface IProductService
     {
-        Products GetAllProducts();
+        IEnumerable<Product> GetAllProducts();
 
-        Products GetProductsByName(string name);
+        IEnumerable<Product> GetProductsByName(string name);
 
         Product GetProductById(Guid id);
 
