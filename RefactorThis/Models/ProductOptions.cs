@@ -1,32 +1,30 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using Newtonsoft.Json;
+using System;
 
 namespace refactor_this.Models
 {
-    public class Products
+    public class ProductOptions
     {
-        public List<Product> Items { get; private set; }
+        public List<ProductOption> Items { get; private set; }
 
-        public Products()
+        public ProductOptions()
         {
-            LoadProducts();
+            LoadProductOptions();
         }
 
-        public Products(string name)
+        public ProductOptions(Guid productId)
         {
-            LoadProductsByName(name);
+            LoadProductOption(productId);
         }
 
-        private void LoadProducts()
+        private void LoadProductOptions()
         {
-
-            Items = new List<Product>();
+            Items = new List<ProductOption>();
 
             using (var conn = Helpers.NewConnection())
             {
-                string sql = "select id from product";
+                string sql = "select id from productoption";
 
                 using (var cmd = new SqlCommand(sql, conn))
                 {
@@ -38,28 +36,30 @@ namespace refactor_this.Models
                         {
                             var id = Guid.Parse(rdr["id"].ToString());
 
-                            Items.Add(new Product(id));
+                            Items.Add(new ProductOption(id));
                         }
                     }
                 }
             }
         }
 
-        private void LoadProductsByName(string name)
+        private void LoadProductOption(Guid productId)
         {
-            if (name == null) throw new ArgumentNullException(nameof(name));
+            var productIdAsString = productId.ToString();
 
-            var lowerCaseName = name?.ToLower();
+            if (string.IsNullOrEmpty(productIdAsString)) throw new ArgumentNullException(nameof(productIdAsString));
 
-            Items = new List<Product>();
+            Items = new List<ProductOption>();
 
             using (var conn = Helpers.NewConnection())
             {
-                string sql = "select id from product where lower(name) like @Name";
+                string sql = "select id from productoption";
+
+                sql += " where productid = @ProductId";
 
                 using (var cmd = new SqlCommand(sql, conn))
                 {
-                    cmd.Parameters.AddWithValue("@Name", lowerCaseName);
+                    cmd.Parameters.AddWithValue("@ProductId", productIdAsString);
 
                     conn.Open();
 
@@ -69,7 +69,7 @@ namespace refactor_this.Models
                         {
                             var id = Guid.Parse(rdr["id"].ToString());
 
-                            Items.Add(new Product(id));
+                            Items.Add(new ProductOption(id));
                         }
                     }
                 }

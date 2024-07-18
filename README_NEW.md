@@ -26,8 +26,11 @@
 - Added new ProductOptionService 
 - Used this new service in the controller
 
-// ToDo: extract product option class from products file (separate products from product options)
-// add a repository layer
+## Seventh commit
+- Separate Product and ProductOption into distinct classes. This aligns with best practices in software development (SOLID), leading to a codebase that is more maintainable, understandable, and scalable. It also enhances the ability to test, reuse, and evolve parts of the system independently
+- By separating these classes, each class adheres more closely to the Single Responsibility Principle. This is one of the SOLID principles of object-oriented design. Essentially a class should only have one reason to change and a single job/responsibility
+
+// ToDo: add a repository layer
 // add list of sql commands to read from (Enum like)
 // ensure endpoints do as expected
 // make sql calls more efficient
