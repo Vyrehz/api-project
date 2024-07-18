@@ -12,6 +12,8 @@ namespace refactor_this.Services
 
         void SaveProductOption(ProductOption productOption);
 
+        void UpsertProductOption(Guid productId, Guid id, ProductOption updatedProduct);
+
         void DeleteProductOption(Guid productId, Guid id);
     }
 }

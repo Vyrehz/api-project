@@ -58,21 +58,7 @@ namespace refactor_this.Controllers
         [HttpPut]
         public void Update(Guid id, Product product)
         {
-            // ToDo: cleanup
-            var orig = _productService.GetProductById(id);
-
-            if (orig == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }   
-
-            orig.Name = product.Name;
-            orig.Description = product.Description;
-            orig.Price = product.Price;
-            orig.DeliveryPrice = product.DeliveryPrice;
-
-            if (!orig.IsNew)
-                _productService.SaveProduct(orig);
+            _productService.UpsertProduct(id, product);
         }
 
         [Route("{id}")]
@@ -114,18 +100,7 @@ namespace refactor_this.Controllers
         [HttpPut]
         public void UpdateOption(Guid productId, Guid id, ProductOption option)
         {
-            var orig = _productOptionService.GetProductOptionById(productId, id);
-
-            if (orig == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            orig.Name = option.Name;
-            orig.Description = option.Description;
-
-            if (!orig.IsNew)
-                _productOptionService.SaveProductOption(orig);
+            _productOptionService.UpsertProductOption(productId, id, option);
         }
 
         [Route("{productId}/options/{id}")]

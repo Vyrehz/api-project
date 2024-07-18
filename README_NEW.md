@@ -51,4 +51,8 @@
 - In future this could be extended for generated API keys but for now I have hardcoded a test key directly into the check function
 - This can be tested using postman and adding a Bearer token with the value: test_api_key
 
+## Twelfth commit
+- Added Upsert function to both services for use in the "Update" endpoint
+- I followed this pattern from the original implementation and made the assumption that Update should also Upsert
+
 // ToDo: tests

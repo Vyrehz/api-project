@@ -37,6 +37,16 @@ namespace refactor_this.Services
             }
         }
 
+        public void UpsertProductOption(Guid productId, Guid id, ProductOption updatedProductOption)
+        {
+            var product = GetProductOptionById(productId, id);
+
+            product.Name = updatedProductOption.Name;
+            product.Description = updatedProductOption.Description;
+
+            SaveProductOption(product);
+        }
+
         public void DeleteProductOption(Guid productId, Guid id)
         {
             var opt = _productOptionRepository.GetById(productId, id);

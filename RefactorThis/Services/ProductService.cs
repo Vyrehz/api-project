@@ -42,6 +42,18 @@ namespace refactor_this.Services
             }
         }
 
+        public void UpsertProduct(Guid id, Product updatedProduct)
+        {
+            var product = GetProductById(id);
+
+            product.Name = updatedProduct.Name;
+            product.Description = updatedProduct.Description;
+            product.Price = updatedProduct.Price;
+            product.DeliveryPrice = updatedProduct.DeliveryPrice;
+
+            SaveProduct(product);
+        }
+
         public void DeleteProduct(Guid id)
         {
             var opt = _productRepository.GetById(id);
