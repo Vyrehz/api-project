@@ -21,3 +21,13 @@
 - Used RegisterType rather than RegisterSingleton for now as the application is not yet thread safe
 - Used the new ProductService as an intermediary layer between the controller and database
 - For now omitting a ProductOptionService and Product/Options Repositories (coming in later commits)
+
+## Sixth commit
+- Added new ProductOptionService 
+- Used this new service in the controller
+
+// ToDo: extract product option class from products file (separate products from product options)
+// add a repository layer
+// add list of sql commands to read from (Enum like)
+// ensure endpoints do as expected
+// make sql calls more efficient

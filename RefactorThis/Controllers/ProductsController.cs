@@ -10,10 +10,12 @@ namespace refactor_this.Controllers
     public class ProductsController : ApiController
     {
         private readonly IProductService _productService;
+        private readonly IProductOptionService _productOptionService;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IProductService productService, IProductOptionService productOptionService)
         {
             _productService = productService;
+            _productOptionService = productOptionService;
         }
 
         [Route]
@@ -76,14 +78,16 @@ namespace refactor_this.Controllers
         [HttpGet]
         public ProductOptions GetOptions(Guid productId)
         {
-            return new ProductOptions(productId);
+            return _productOptionService.GetAllProductOptionsById(productId);
         }
 
         [Route("{productId}/options/{id}")]
         [HttpGet]
         public ProductOption GetOption(Guid productId, Guid id)
         {
-            var option = new ProductOption(id);
+            // ToDo: productId is not used in the method
+            var option = _productOptionService.GetProductOptionById(id);
+
             if (option.IsNew)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
@@ -95,7 +99,8 @@ namespace refactor_this.Controllers
         public void CreateOption(Guid productId, ProductOption option)
         {
             option.ProductId = productId;
-            option.Save();
+
+            _productOptionService.SaveProductOption(option);
         }
 
         [Route("{productId}/options/{id}")]
@@ -109,15 +114,14 @@ namespace refactor_this.Controllers
             };
 
             if (!orig.IsNew)
-                orig.Save();
+                _productOptionService.SaveProductOption(orig);
         }
 
         [Route("{productId}/options/{id}")]
         [HttpDelete]
         public void DeleteOption(Guid id)
         {
-            var opt = new ProductOption(id);
-            opt.Delete();
+            _productOptionService.DeleteProductOption(id);
         }
     }
 }

@@ -22,6 +22,7 @@ namespace refactor_this
         {
             // Register interface mappings
             container.RegisterType<IProductService, ProductService>();
+            container.RegisterType<IProductOptionService, ProductOptionService>();
 
             GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
         }
