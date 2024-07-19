@@ -34,6 +34,14 @@ To get a local copy up and running follow these simple steps:
 To run the unit tests, navigate to the test project directory and run:
   dotnet test
 
+## Future Improvements
+- Use docker containerisation to host the application on a cloud platform (AWS or GCP etc)
+- Use a more secure database system such as MongoDb with encrypted ConnectionStrings
+- Generate unique API keys to allow connections to the ProductsAPI
+- Write more tests, specifically integration tests for the repositories
+- Extract some more configuration out, such as the SQL strings
+- Use github actions to add a workflow and automatically run tests on each branch push
+
 ## Commit History
 Whilst developing this project I have been using git to keep track of my changes, here is a link to my repository:
 
@@ -111,3 +119,9 @@ Below is a more in depth look into my commit history, including my logic and rea
 ## Fifteenth commit
 - Added tests for both services
 - Also changed ConnectionHelper to use an interface
+
+## Sixteenth commit
+- Updated README
+
+## Seventeenth commit
+- Fixed nuget package references
