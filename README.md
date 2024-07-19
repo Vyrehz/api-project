@@ -21,6 +21,19 @@ The API supports CRUD operations for products and product options. Here are some
 10. `PUT /products/{id}/options/{optionId}` - updates the specified product option.
 11. `DELETE /products/{id}/options/{optionId}` - deletes the specified product option.
 
+## Getting Started
+To get a local copy up and running follow these simple steps:
+
+1. Clone the repository:
+   git clone https://github.com/Vyrehz/xero-test.git
+2. Restore NuGet packages:
+   dotnet restore
+3. Run the application:
+
+## Testing
+To run the unit tests, navigate to the test project directory and run:
+  dotnet test
+
 ## Commit History
 Whilst developing this project I have been using git to keep track of my changes, here is a link to my repository:
 
