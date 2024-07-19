@@ -71,16 +71,16 @@ namespace refactor_this.Controllers
 
         [Route("{productId}/options")]
         [HttpGet]
-        public IEnumerable<ProductOption> GetOptions(Guid productId)
+        public async Task<IEnumerable<ProductOption>> GetOptionsAsync(Guid productId)
         {
-            return _productOptionService.GetAllProductOptionsById(productId);
+            return await _productOptionService.GetAllProductOptionsByIdAsync(productId);
         }
 
         [Route("{productId}/options/{id}")]
         [HttpGet]
-        public ProductOption GetOption(Guid productId, Guid id)
+        public async Task<ProductOption> GetOptionAsync(Guid productId, Guid id)
         {
-            var option = _productOptionService.GetProductOptionById(productId, id);
+            var option = await _productOptionService.GetProductOptionByIdAsync(productId, id);
 
             if (option.IsNew)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -90,25 +90,25 @@ namespace refactor_this.Controllers
 
         [Route("{productId}/options")]
         [HttpPost]
-        public void CreateOption(Guid productId, ProductOption option)
+        public async Task CreateOptionAsync(Guid productId, ProductOption option)
         {
             option.ProductId = productId;
 
-            _productOptionService.SaveProductOption(option);
+            await _productOptionService.SaveProductOptionAsync(option);
         }
 
         [Route("{productId}/options/{id}")]
         [HttpPut]
-        public void UpdateOption(Guid productId, Guid id, ProductOption option)
+        public async Task UpdateOptionAsync(Guid productId, Guid id, ProductOption option)
         {
-            _productOptionService.UpsertProductOption(productId, id, option);
+            await _productOptionService.UpsertProductOptionAsync(productId, id, option);
         }
 
         [Route("{productId}/options/{id}")]
         [HttpDelete]
-        public void DeleteOption(Guid productId, Guid id)
+        public async Task DeleteOptionAsync(Guid productId, Guid id)
         {
-            _productOptionService.DeleteProductOption(productId, id);
+            await _productOptionService.DeleteProductOptionAsync(productId, id);
         }
     }
 }

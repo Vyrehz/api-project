@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using refactor_this.Models;
 
 namespace refactor_this.Services
 {
     public interface IProductOptionService
     {
-        IEnumerable<ProductOption> GetAllProductOptionsById(Guid productId);
+        Task<IEnumerable<ProductOption>> GetAllProductOptionsByIdAsync(Guid productId);
 
-        ProductOption GetProductOptionById(Guid productId, Guid id);
+        Task<ProductOption> GetProductOptionByIdAsync(Guid productId, Guid id);
 
-        void SaveProductOption(ProductOption productOption);
+        Task SaveProductOptionAsync(ProductOption productOption);
 
-        void UpsertProductOption(Guid productId, Guid id, ProductOption updatedProduct);
+        Task UpsertProductOptionAsync(Guid productId, Guid id, ProductOption updatedProduct);
 
-        void DeleteProductOption(Guid productId, Guid id);
+        Task DeleteProductOptionAsync(Guid productId, Guid id);
     }
 }

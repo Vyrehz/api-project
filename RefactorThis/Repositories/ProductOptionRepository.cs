@@ -2,13 +2,14 @@ using refactor_this.Models;
 using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using refactor_this.Exceptions;
 
 namespace refactor_this.Repositories
 {
     public class ProductOptionRepository : IProductOptionRepository
     {
-        public IEnumerable<ProductOption> GetAllByProductId(Guid productId)
+        public async Task<IEnumerable<ProductOption>> GetAllByProductIdAsync(Guid productId)
         {
             var items = new List<ProductOption>();
 
@@ -20,19 +21,17 @@ namespace refactor_this.Repositories
 
                 using (var conn = Helpers.NewConnection())
                 {
-                    string sql = "SELECT * FROM productoption";
-
-                    sql += " WHERE productid = @ProductId";
+                    const string sql = "SELECT * FROM productoption WHERE productid = @ProductId";
 
                     using (var cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@ProductId", productIdAsString);
 
-                        conn.Open();
+                        await conn.OpenAsync();
 
-                        using (var rdr = cmd.ExecuteReader())
+                        using (var rdr = await cmd.ExecuteReaderAsync())
                         {
-                            while (rdr.Read())
+                            while (await rdr.ReadAsync())
                             {
                                 var option = new ProductOption
                                 {
@@ -65,30 +64,34 @@ namespace refactor_this.Repositories
             return items;
         }
 
-        public ProductOption GetById(Guid productId, Guid id)
+        public async Task<ProductOption> GetByIdAsync(Guid productId, Guid id)
         {
             try
             {
                 var option = new ProductOption();
 
                 using (var conn = Helpers.NewConnection())
-                using (var cmd = new SqlCommand("SELECT * FROM productoption WHERE id = @Id AND productid = @ProductId", conn))
                 {
-                    cmd.Parameters.AddWithValue("@Id", id);
-                    cmd.Parameters.AddWithValue("@ProductId", productId);
+                    const string sql = "SELECT * FROM productoption WHERE id = @Id AND productid = @ProductId";
 
-                    conn.Open();
-
-                    using (var rdr = cmd.ExecuteReader())
+                    using (var cmd = new SqlCommand(sql, conn))
                     {
-                        if (!rdr.Read()) return option;
+                        cmd.Parameters.AddWithValue("@Id", id);
+                        cmd.Parameters.AddWithValue("@ProductId", productId);
 
-                        option.IsNew = false;
-                        option.Id = Guid.Parse(rdr["Id"].ToString());
-                        option.ProductId = Guid.Parse(rdr["ProductId"].ToString());
-                        option.Name = rdr["Name"].ToString();
-                        option.Description =
-                            (DBNull.Value == rdr["Description"]) ? null : rdr["Description"].ToString();
+                        await conn.OpenAsync();
+
+                        using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            if (!await rdr.ReadAsync()) return option;
+
+                            option.IsNew = false;
+                            option.Id = Guid.Parse(rdr["Id"].ToString());
+                            option.ProductId = Guid.Parse(rdr["ProductId"].ToString());
+                            option.Name = rdr["Name"].ToString();
+                            option.Description =
+                                (DBNull.Value == rdr["Description"]) ? null : rdr["Description"].ToString();
+                        }
                     }
                 }
 
@@ -108,7 +111,7 @@ namespace refactor_this.Repositories
             }
         }
 
-        public void Add(ProductOption option)
+        public async Task AddAsync(ProductOption option)
         {
             try
             {
@@ -116,8 +119,7 @@ namespace refactor_this.Repositories
 
                 using (var conn = Helpers.NewConnection())
                 {
-                    string sql =
-                        "INSERT INTO productoption (id, productid, name, description) VALUES (@Id, @ProductId, @Name, @Description)";
+                    const string sql = "INSERT INTO productoption (id, productid, name, description) VALUES (@Id, @ProductId, @Name, @Description)";
 
                     using (var cmd = new SqlCommand(sql, conn))
                     {
@@ -125,8 +127,8 @@ namespace refactor_this.Repositories
                         cmd.Parameters.AddWithValue("@ProductId", option.ProductId);
                         cmd.Parameters.AddWithValue("@Name", option.Name);
                         cmd.Parameters.AddWithValue("@Description", option.Description ?? (object)DBNull.Value);
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
+                        await conn.OpenAsync();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }
@@ -144,7 +146,7 @@ namespace refactor_this.Repositories
             }
         }
 
-        public void Update(ProductOption option)
+        public async Task UpdateAsync(ProductOption option)
         {
             try
             {
@@ -152,8 +154,7 @@ namespace refactor_this.Repositories
 
                 using (var conn = Helpers.NewConnection())
                 {
-                    string sql =
-                        "UPDATE productoption SET name = @Name, description = @Description WHERE id = @Id";
+                    const string sql = "UPDATE productoption SET name = @Name, description = @Description WHERE id = @Id";
 
                     using (var cmd = new SqlCommand(sql, conn))
                     {
@@ -161,8 +162,8 @@ namespace refactor_this.Repositories
                         cmd.Parameters.AddWithValue("@ProductId", option.ProductId);
                         cmd.Parameters.AddWithValue("@Name", option.Name);
                         cmd.Parameters.AddWithValue("@Description", option.Description ?? (object)DBNull.Value);
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
+                        await conn.OpenAsync();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }
@@ -180,16 +181,20 @@ namespace refactor_this.Repositories
             }
         }
 
-        public void Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
             try
             {
                 using (var conn = Helpers.NewConnection())
-                using (var cmd = new SqlCommand("DELETE FROM productoption WHERE id = @Id", conn))
                 {
-                    cmd.Parameters.AddWithValue("@Id", id);
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
+                    const string sql = "DELETE FROM productoption WHERE id = @Id";
+
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Id", id);
+                        await conn.OpenAsync();
+                        await cmd.ExecuteNonQueryAsync();
+                    }
                 }
             }
             catch (SqlException ex)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 using refactor_this.Models;
 using refactor_this.Repositories;
@@ -15,48 +16,48 @@ namespace refactor_this.Services
             _productOptionRepository = productOptionRepository;
         }
 
-        public IEnumerable<ProductOption> GetAllProductOptionsById(Guid productId)
+        public async Task<IEnumerable<ProductOption>> GetAllProductOptionsByIdAsync(Guid productId)
         {
-            return _productOptionRepository.GetAllByProductId(productId);
+            return await _productOptionRepository.GetAllByProductIdAsync(productId);
         }
 
-        public ProductOption GetProductOptionById(Guid productId, Guid id)
+        public async Task<ProductOption> GetProductOptionByIdAsync(Guid productId, Guid id)
         {
-            return _productOptionRepository.GetById(productId, id);
+            return await _productOptionRepository.GetByIdAsync(productId, id);
         }
 
-        public void SaveProductOption(ProductOption productOption)
+        public async Task SaveProductOptionAsync(ProductOption productOption)
         {
             if (productOption.IsNew)
             {
-                _productOptionRepository.Add(productOption);
+                await _productOptionRepository.AddAsync(productOption);
             }
             else
             {
-                _productOptionRepository.Update(productOption);
+                await _productOptionRepository.UpdateAsync(productOption);
             }
         }
 
-        public void UpsertProductOption(Guid productId, Guid id, ProductOption updatedProductOption)
+        public async Task UpsertProductOptionAsync(Guid productId, Guid id, ProductOption updatedProductOption)
         {
-            var product = GetProductOptionById(productId, id);
+            var product = await GetProductOptionByIdAsync(productId, id);
 
             product.Name = updatedProductOption.Name;
             product.Description = updatedProductOption.Description;
 
-            SaveProductOption(product);
+            await SaveProductOptionAsync(product);
         }
 
-        public void DeleteProductOption(Guid productId, Guid id)
+        public async Task DeleteProductOptionAsync(Guid productId, Guid id)
         {
-            var opt = _productOptionRepository.GetById(productId, id);
+            var opt = await _productOptionRepository.GetByIdAsync(productId, id);
 
             if (opt == null)
             {
                 throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
             }
 
-            _productOptionRepository.Delete(id);
+            await _productOptionRepository.DeleteAsync(id);
         }
     }
 }

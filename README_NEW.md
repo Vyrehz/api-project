@@ -58,7 +58,11 @@
 ## Thirteenth commit
 - Added Unit tests project
 - Added tests for Product only endpoints (excluding options for now)
-- Used async and await operations to provide thread safe functions
+- Used async and await operations for Product service and repo to provide thread safe functions
 - Allows for scalability by not blocking threads when waiting for I/O operations (database calls etc)
+
+## Fourteenth commit
+- Added tests for ProductOption endpoints
+- Used async and await operations for ProductOption service and repo to provide thread safe functions
 
 // ToDo: tests

@@ -121,21 +121,25 @@ namespace refactor_this.Repositories
                 var product = new Product();
 
                 using (var conn = Helpers.NewConnection())
-                using (var cmd = new SqlCommand("SELECT * FROM product WHERE id = @Id", conn))
                 {
-                    cmd.Parameters.AddWithValue("@Id", id);
-                    await conn.OpenAsync();
+                    const string sql = "SELECT * FROM product WHERE id = @Id";
 
-                    using (var rdr = await cmd.ExecuteReaderAsync())
+                    using (var cmd = new SqlCommand(sql, conn))
                     {
-                        if (!await rdr.ReadAsync()) return product;
+                        cmd.Parameters.AddWithValue("@Id", id);
+                        await conn.OpenAsync();
 
-                        product.IsNew = false;
-                        product.Id = Guid.Parse(rdr["Id"].ToString());
-                        product.Name = rdr["Name"].ToString();
-                        product.Description = (DBNull.Value == rdr["Description"]) ? null : rdr["Description"].ToString();
-                        product.Price = decimal.Parse(rdr["Price"].ToString());
-                        product.DeliveryPrice = decimal.Parse(rdr["DeliveryPrice"].ToString());
+                        using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            if (!await rdr.ReadAsync()) return product;
+
+                            product.IsNew = false;
+                            product.Id = Guid.Parse(rdr["Id"].ToString());
+                            product.Name = rdr["Name"].ToString();
+                            product.Description = (DBNull.Value == rdr["Description"]) ? null : rdr["Description"].ToString();
+                            product.Price = decimal.Parse(rdr["Price"].ToString());
+                            product.DeliveryPrice = decimal.Parse(rdr["DeliveryPrice"].ToString());
+                        }
                     }
                 }
 
@@ -235,11 +239,15 @@ namespace refactor_this.Repositories
             try
             {
                 using (var conn = Helpers.NewConnection())
-                using (var cmd = new SqlCommand("DELETE FROM product WHERE id = @Id", conn))
                 {
-                    cmd.Parameters.AddWithValue("@Id", id);
-                    await conn.OpenAsync();
-                    await cmd.ExecuteNonQueryAsync();
+                    const string sql = "DELETE FROM product WHERE id = @Id";
+
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Id", id);
+                        await conn.OpenAsync();
+                        await cmd.ExecuteNonQueryAsync();
+                    }
                 }
             }
             catch (SqlException ex)
