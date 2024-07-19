@@ -8,7 +8,7 @@ using refactor_this.Services;
 using Moq;
 using AutoFixture;
 
-namespace RefactorThis.Tests.ProductsTests
+namespace RefactorThis.Tests.ControllerTests
 {
     [TestClass]
     public class ProductsControllerTests

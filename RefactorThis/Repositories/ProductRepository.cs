@@ -9,13 +9,20 @@ namespace refactor_this.Repositories
 {
     public class ProductRepository : IProductRepository
     {
+        private readonly IConnectionHelper _connectionHelper;
+
+        public ProductRepository(IConnectionHelper connectionHelper)
+        {
+            _connectionHelper = connectionHelper;
+        }
+
         public async Task<IEnumerable<Product>> GetAllAsync()
         {
             var items = new List<Product>();
 
             try
             {
-                using (var conn = Helpers.NewConnection())
+                using (var conn = _connectionHelper.NewConnection())
                 {
                     const string sql = "SELECT * FROM product"; // Fetch all details in a single query
 
@@ -68,7 +75,7 @@ namespace refactor_this.Repositories
 
                 var items = new List<Product>();
 
-                using (var conn = Helpers.NewConnection())
+                using (var conn = _connectionHelper.NewConnection())
                 {
                     const string sql = "SELECT * FROM product WHERE lower(name) LIKE @Name";
 
@@ -120,7 +127,7 @@ namespace refactor_this.Repositories
             {
                 var product = new Product();
 
-                using (var conn = Helpers.NewConnection())
+                using (var conn = _connectionHelper.NewConnection())
                 {
                     const string sql = "SELECT * FROM product WHERE id = @Id";
 
@@ -166,7 +173,7 @@ namespace refactor_this.Repositories
 
             try
             {
-                using (var conn = Helpers.NewConnection())
+                using (var conn = _connectionHelper.NewConnection())
                 {
                     const string sql = "INSERT INTO product (id, name, description, price, deliveryprice) VALUES (@Id, @Name, @Description, @Price, @DeliveryPrice)";
 
@@ -203,7 +210,7 @@ namespace refactor_this.Repositories
             {
                 if (product == null) throw new ArgumentNullException(nameof(product));
 
-                using (var conn = Helpers.NewConnection())
+                using (var conn = _connectionHelper.NewConnection())
                 {
                     const string sql = "UPDATE product SET name = @Name, description = @Description, price = @Price, deliveryprice = @DeliveryPrice WHERE id = @Id";
 
@@ -238,7 +245,7 @@ namespace refactor_this.Repositories
         {
             try
             {
-                using (var conn = Helpers.NewConnection())
+                using (var conn = _connectionHelper.NewConnection())
                 {
                     const string sql = "DELETE FROM product WHERE id = @Id";
 

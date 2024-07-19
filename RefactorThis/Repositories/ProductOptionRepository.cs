@@ -9,6 +9,13 @@ namespace refactor_this.Repositories
 {
     public class ProductOptionRepository : IProductOptionRepository
     {
+        private readonly IConnectionHelper _connectionHelper;
+
+        public ProductOptionRepository(IConnectionHelper connectionHelper)
+        {
+            _connectionHelper = connectionHelper;
+        }
+
         public async Task<IEnumerable<ProductOption>> GetAllByProductIdAsync(Guid productId)
         {
             var items = new List<ProductOption>();
@@ -19,7 +26,7 @@ namespace refactor_this.Repositories
 
                 if (string.IsNullOrEmpty(productIdAsString)) throw new ArgumentNullException(nameof(productIdAsString));
 
-                using (var conn = Helpers.NewConnection())
+                using (var conn = _connectionHelper.NewConnection())
                 {
                     const string sql = "SELECT * FROM productoption WHERE productid = @ProductId";
 
@@ -70,7 +77,7 @@ namespace refactor_this.Repositories
             {
                 var option = new ProductOption();
 
-                using (var conn = Helpers.NewConnection())
+                using (var conn = _connectionHelper.NewConnection())
                 {
                     const string sql = "SELECT * FROM productoption WHERE id = @Id AND productid = @ProductId";
 
@@ -117,7 +124,7 @@ namespace refactor_this.Repositories
             {
                 if (option == null) throw new ArgumentNullException(nameof(option));
 
-                using (var conn = Helpers.NewConnection())
+                using (var conn = _connectionHelper.NewConnection())
                 {
                     const string sql = "INSERT INTO productoption (id, productid, name, description) VALUES (@Id, @ProductId, @Name, @Description)";
 
@@ -152,7 +159,7 @@ namespace refactor_this.Repositories
             {
                 if (option == null) throw new ArgumentNullException(nameof(option));
 
-                using (var conn = Helpers.NewConnection())
+                using (var conn = _connectionHelper.NewConnection())
                 {
                     const string sql = "UPDATE productoption SET name = @Name, description = @Description WHERE id = @Id";
 
@@ -185,7 +192,7 @@ namespace refactor_this.Repositories
         {
             try
             {
-                using (var conn = Helpers.NewConnection())
+                using (var conn = _connectionHelper.NewConnection())
                 {
                     const string sql = "DELETE FROM productoption WHERE id = @Id";
 

@@ -65,4 +65,6 @@
 - Added tests for ProductOption endpoints
 - Used async and await operations for ProductOption service and repo to provide thread safe functions
 
-// ToDo: tests
+## Fifteenth commit
+- Added tests for both services
+- Also changed ConnectionHelper to use an interface

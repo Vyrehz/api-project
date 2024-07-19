@@ -1,5 +1,6 @@
 using System;
 using System.Web.Http;
+using refactor_this.Models;
 using refactor_this.Repositories;
 using refactor_this.Services;
 using Unity;
@@ -26,6 +27,7 @@ namespace refactor_this
             container.RegisterType<IProductOptionService, ProductOptionService>();
             container.RegisterType<IProductRepository, ProductRepository>();
             container.RegisterType<IProductOptionRepository, ProductOptionRepository>();
+            container.RegisterType<IConnectionHelper, Helpers>();
 
             GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
         }
