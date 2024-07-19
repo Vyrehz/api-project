@@ -1,24 +1,13 @@
-The attached project is a poorly written products API.
+# Refactor-This API Project
+Below I have listed my primary changes through a text commit history. This history outlines my logic and reasoning behind certain changes.
 
-Your job, should you choose to accept it, is to make changes to this project to make it better. Simple. There are no rules, changes are not limited to pure refactors.
+## Introduction
 
-There is no time limit (we all work at different speed!), but as a guideline, we recommend spending between 2-4 hours on the exercise. 
+This project is a RESTful API for managing products and their options. It was developed as part of a job application take-home test. The API is built with .NET, showcasing best practices in software development, including SOLID principles, dependency injection, unit testing and error handling.
 
-Please consider all aspects of good software engineering (including but not limited to design, reliability, readability, extensibility, quality) and show us how you'll make it #beautiful.
+## Usage
 
-Once completed, send back your solution in a zip file (source code only please to keep the zip small) and include a new README describing the improvements you have made and the rationale behind those decisions. 
-
-Good luck!
-
-## Instructions
-
-To set up the project:
-
-* Open project in VS.
-* Restore nuget packages and rebuild.
-* Run the project.
-
-There should be these endpoints:
+The API supports CRUD operations for products and product options. Here are some example requests:
 
 1. `GET /products` - gets all products.
 2. `GET /products?name={name}` - finds all products matching the specified name.
@@ -32,52 +21,80 @@ There should be these endpoints:
 10. `PUT /products/{id}/options/{optionId}` - updates the specified product option.
 11. `DELETE /products/{id}/options/{optionId}` - deletes the specified product option.
 
-All models are specified in the `/Models` folder, but should conform to:
+## Commit History
+Whilst developing this project I have been using git to keep track of my changes, here is a link to my repository:
 
-**Product:**
-```
-{
-  "Id": "01234567-89ab-cdef-0123-456789abcdef",
-  "Name": "Product name",
-  "Description": "Product description",
-  "Price": 123.45,
-  "DeliveryPrice": 12.34
-}
-```
+https://github.com/Vyrehz/xero-test/compare/master...feature/ajh-xero-refactoring-take-home-assessment
 
-**Products:**
-```
-{
-  "Items": [
-    {
-      // product
-    },
-    {
-      // product
-    }
-  ]
-}
-```
+Below is a more in depth look into my commit history, including my logic and reasoning behind certain implementation details and decisions I made along the way.
 
-**Product Option:**
-```
-{
-  "Id": "01234567-89ab-cdef-0123-456789abcdef",
-  "Name": "Product name",
-  "Description": "Product description"
-}
-```
+## Initial commit
+- Restore nuget packages
+- Correct Assembly name and Default namespace from refactor-me to refactor-this
+- Update Newtonsoft.Json from 8.0.3 to Latest stable 13.0.3 due to high severity vulnerability alert
+- Add api prefix to the RoutePrefix
 
-**Product Options:**
-```
-{
-  "Items": [
-    {
-      // product option
-    },
-    {
-      // product option
-    }
-  ]
-}
-```
+## Second commit
+- Refactoring SQL Connections and Commands to use Using Statements. This ensures that all SQL-related objects are properly disposed of, reducing the risk of memory leaks and ensures that database connections are closed appropriately
+- Also changed ExecuteReader to ExecuteNonQuery for the Delete method.ExecuteReader is not suitable for deletion since it's intended use is to retrieve data. ExecuteNonQuery is used for INSERT, UPDATE and DELETE queries, I.E queries that are intended for modifying data, not retrieving it.
+- Fixed mistake I had made including a / in front of the api/products prefix
+
+## Third commit
+- Used SQL Parameters to prevent SQL injection attacks. This ensures that the values are properly escaped and treated as values rather than as part of the SQL command text
+
+## Fourth commit
+- Added extra methods for LoadProductOption and LoadProduct to avoid passing in where clauses and reducing code complexity. This came at the cost of code duplication but resulted in better readabiltiy
+
+## Fifth commit
+- Added a service layer with dependency injection using Unity to achieve IoC
+- For now starting with a basic implementation of the GetAll method from Products
+- Used RegisterType rather than RegisterSingleton for now as the application is not yet thread safe
+- Used the new ProductService as an intermediary layer between the controller and database
+- For now omitting a ProductOptionService and Product/Options Repositories (coming in later commits)
+
+## Sixth commit
+- Added new ProductOptionService 
+- Used this new service in the controller
+
+## Seventh commit
+- Separate Product and ProductOption into distinct classes. This aligns with best practices in software development (SOLID), leading to a codebase that is more maintainable, understandable, and scalable. It also enhances the ability to test, reuse, and evolve parts of the system independently
+- By separating these classes, each class adheres more closely to the Single Responsibility Principle. This is one of the SOLID principles of object-oriented design. Essentially a class should only have one reason to change and a single job/responsibility
+
+## Eighth commit
+- Added a repository layer for both Products and ProductOptions
+- Removed Products and ProductOptions classes and replaced with Enumerables
+- Use Repositories in both Services
+
+## Ninth commit
+- Added error handling for both repositories
+- Allows greater visibility for any SQL errors that occur (through the use of logging)
+- Also added null argument checks for all functions with non-GUID arguments
+
+## Tenth commit
+- Simplified SQL query for getting all products and all productOptions by id
+- Replaced SELECT id with SELECT * and then set values accordingly
+- This removed multiple extra calls to getById
+- Also ensured the option get queries reference the productId
+
+## Eleventh commit
+- Added ApiKeyAuthentication
+- In future this could be extended for generated API keys but for now I have hardcoded a test key directly into the check function
+- This can be tested using postman and adding a Bearer token with the value: test_api_key
+
+## Twelfth commit
+- Added Upsert function to both services for use in the "Update" endpoint
+- I followed this pattern from the original implementation and made the assumption that Update should also Upsert
+
+## Thirteenth commit
+- Added Unit tests project
+- Added tests for Product only endpoints (excluding options for now)
+- Used async and await operations for Product service and repo to provide thread safe functions
+- Allows for scalability by not blocking threads when waiting for I/O operations (database calls etc)
+
+## Fourteenth commit
+- Added tests for ProductOption endpoints
+- Used async and await operations for ProductOption service and repo to provide thread safe functions
+
+## Fifteenth commit
+- Added tests for both services
+- Also changed ConnectionHelper to use an interface
