@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 using refactor_this.Models;
 using refactor_this.Repositories;
@@ -15,55 +16,55 @@ namespace refactor_this.Services
             _productRepository = productRepository;
         }
 
-        public IEnumerable<Product> GetAllProducts()
+        public async Task<IEnumerable<Product>> GetAllProductsAsync()
         {
-            return _productRepository.GetAll();
+            return await _productRepository.GetAllAsync();
         }
 
-        public IEnumerable<Product> GetProductsByName(string name)
+        public async Task<IEnumerable<Product>> GetProductsByNameAsync(string name)
         {
-            return _productRepository.GetByName(name);
+            return await _productRepository.GetByNameAsync(name);
         }
 
-        public Product GetProductById(Guid id)
+        public async Task<Product> GetProductByIdAsync(Guid id)
         {
-            return _productRepository.GetById(id);
+            return await _productRepository.GetByIdAsync(id);
         }
 
-        public void SaveProduct(Product product)
+        public async Task SaveProductAsync(Product product)
         {
             if (product.IsNew)
             {
-                _productRepository.Add(product);
+                await _productRepository.AddAsync(product);
             }
             else
             {
-                _productRepository.Update(product);
+                await _productRepository.UpdateAsync(product);
             }
         }
 
-        public void UpsertProduct(Guid id, Product updatedProduct)
+        public async Task UpsertProductAsync(Guid id, Product updatedProduct)
         {
-            var product = GetProductById(id);
+            var product = await GetProductByIdAsync(id);
 
             product.Name = updatedProduct.Name;
             product.Description = updatedProduct.Description;
             product.Price = updatedProduct.Price;
             product.DeliveryPrice = updatedProduct.DeliveryPrice;
 
-            SaveProduct(product);
+            await SaveProductAsync(product);
         }
 
-        public void DeleteProduct(Guid id)
+        public async Task DeleteProductAsync(Guid id)
         {
-            var opt = _productRepository.GetById(id);
+            var opt = await _productRepository.GetByIdAsync(id);
 
             if (opt == null)
             {
                 throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
             }
 
-            _productRepository.Delete(id);
+            await _productRepository.DeleteAsync(id);
         }
     }
 }

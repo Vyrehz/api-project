@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using refactor_this.Models;
 
 namespace refactor_this.Services
 {
     public interface IProductService
     {
-        IEnumerable<Product> GetAllProducts();
+        Task<IEnumerable<Product>> GetAllProductsAsync();
 
-        IEnumerable<Product> GetProductsByName(string name);
+        Task<IEnumerable<Product>> GetProductsByNameAsync(string name);
 
-        Product GetProductById(Guid id);
+        Task<Product> GetProductByIdAsync(Guid id);
 
-        void SaveProduct(Product product);
+        Task SaveProductAsync(Product product);
 
-        void UpsertProduct(Guid id, Product product);
+        Task UpsertProductAsync(Guid id, Product product);
 
-        void DeleteProduct(Guid id);
+        Task DeleteProductAsync(Guid id);
     }
 }

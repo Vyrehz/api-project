@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web.Http;
 using refactor_this.Authentication;
 using refactor_this.Models;
@@ -23,23 +24,23 @@ namespace refactor_this.Controllers
 
         [Route]
         [HttpGet]
-        public IEnumerable<Product> GetAll()
+        public async Task<IEnumerable<Product>> GetAllAsync()
         {
-            return _productService.GetAllProducts();
+            return await _productService.GetAllProductsAsync();
         }
 
         [Route]
         [HttpGet]
-        public IEnumerable<Product> SearchByName(string name)
+        public async Task<IEnumerable<Product>> SearchByNameAsync(string name)
         {
-            return _productService.GetProductsByName(name);
+            return await _productService.GetProductsByNameAsync(name);
         }
 
         [Route("{id}")]
         [HttpGet]
-        public Product GetProduct(Guid id)
+        public async Task<Product> GetProductAsync(Guid id)
         {
-            var product = _productService.GetProductById(id);
+            var product = await _productService.GetProductByIdAsync(id);
 
             if (product.IsNew)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -49,23 +50,23 @@ namespace refactor_this.Controllers
 
         [Route]
         [HttpPost]
-        public void Create(Product product)
+        public async Task CreateAsync(Product product)
         {
-            _productService.SaveProduct(product);
+            await _productService.SaveProductAsync(product);
         }
 
         [Route("{id}")]
         [HttpPut]
-        public void Update(Guid id, Product product)
+        public async Task UpdateAsync(Guid id, Product product)
         {
-            _productService.UpsertProduct(id, product);
+            await _productService.UpsertProductAsync(id, product);
         }
 
         [Route("{id}")]
         [HttpDelete]
-        public void Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            _productService.DeleteProduct(id);
+            await _productService.DeleteProductAsync(id);
         }
 
         [Route("{productId}/options")]

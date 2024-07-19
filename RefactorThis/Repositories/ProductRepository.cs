@@ -2,13 +2,14 @@ using refactor_this.Models;
 using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using refactor_this.Exceptions;
 
 namespace refactor_this.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        public IEnumerable<Product> GetAll()
+        public async Task<IEnumerable<Product>> GetAllAsync()
         {
             var items = new List<Product>();
 
@@ -16,14 +17,14 @@ namespace refactor_this.Repositories
             {
                 using (var conn = Helpers.NewConnection())
                 {
-                    string sql = "SELECT * FROM product"; // Fetch all details in a single query
+                    const string sql = "SELECT * FROM product"; // Fetch all details in a single query
 
                     using (var cmd = new SqlCommand(sql, conn))
                     {
-                        conn.Open();
-                        using (var rdr = cmd.ExecuteReader())
+                        await conn.OpenAsync();
+                        using (var rdr = await cmd.ExecuteReaderAsync())
                         {
-                            while (rdr.Read())
+                            while (await rdr.ReadAsync())
                             {
                                 var product = new Product
                                 {
@@ -57,7 +58,7 @@ namespace refactor_this.Repositories
             return items;
         }
 
-        public IEnumerable<Product> GetByName(string name)
+        public async Task<IEnumerable<Product>> GetByNameAsync(string name)
         {
             try
             {
@@ -69,21 +70,27 @@ namespace refactor_this.Repositories
 
                 using (var conn = Helpers.NewConnection())
                 {
-                    string sql = "SELECT id FROM product WHERE lower(name) LIKE @Name";
+                    const string sql = "SELECT * FROM product WHERE lower(name) LIKE @Name";
 
                     using (var cmd = new SqlCommand(sql, conn))
                     {
-                        cmd.Parameters.AddWithValue("@Name", lowerCaseName);
+                        await conn.OpenAsync();
 
-                        conn.Open();
+                        cmd.Parameters.AddWithValue("@Name", $"%{lowerCaseName}%");
 
-                        using (var rdr = cmd.ExecuteReader())
+                        using (var rdr = await cmd.ExecuteReaderAsync())
                         {
-                            while (rdr.Read())
+                            while (await rdr.ReadAsync())
                             {
-                                var id = Guid.Parse(rdr["id"].ToString());
-                                var product = GetById(id);
-
+                                var product = new Product
+                                {
+                                    IsNew = false,
+                                    Id = Guid.Parse(rdr["Id"].ToString()),
+                                    Name = rdr["Name"].ToString(),
+                                    Description = (DBNull.Value == rdr["Description"]) ? null : rdr["Description"].ToString(),
+                                    Price = decimal.Parse(rdr["Price"].ToString()),
+                                    DeliveryPrice = decimal.Parse(rdr["DeliveryPrice"].ToString())
+                                };
                                 items.Add(product);
                             }
                         }
@@ -107,7 +114,7 @@ namespace refactor_this.Repositories
             }
         }
 
-        public Product GetById(Guid id)
+        public async Task<Product> GetByIdAsync(Guid id)
         {
             try
             {
@@ -117,11 +124,11 @@ namespace refactor_this.Repositories
                 using (var cmd = new SqlCommand("SELECT * FROM product WHERE id = @Id", conn))
                 {
                     cmd.Parameters.AddWithValue("@Id", id);
-                    conn.Open();
+                    await conn.OpenAsync();
 
-                    using (var rdr = cmd.ExecuteReader())
+                    using (var rdr = await cmd.ExecuteReaderAsync())
                     {
-                        if (!rdr.Read()) return product;
+                        if (!await rdr.ReadAsync()) return product;
 
                         product.IsNew = false;
                         product.Id = Guid.Parse(rdr["Id"].ToString());
@@ -149,7 +156,7 @@ namespace refactor_this.Repositories
             }
         }
 
-        public void Add(Product product)
+        public async Task AddAsync(Product product)
         {
             if (product == null) throw new ArgumentNullException(nameof(product));
 
@@ -157,7 +164,7 @@ namespace refactor_this.Repositories
             {
                 using (var conn = Helpers.NewConnection())
                 {
-                    string sql = "INSERT INTO product (id, name, description, price, deliveryprice) VALUES (@Id, @Name, @Description, @Price, @DeliveryPrice)";
+                    const string sql = "INSERT INTO product (id, name, description, price, deliveryprice) VALUES (@Id, @Name, @Description, @Price, @DeliveryPrice)";
 
                     using (var cmd = new SqlCommand(sql, conn))
                     {
@@ -166,8 +173,8 @@ namespace refactor_this.Repositories
                         cmd.Parameters.AddWithValue("@Description", product.Description ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@Price", product.Price);
                         cmd.Parameters.AddWithValue("@DeliveryPrice", product.DeliveryPrice);
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
+                        await conn.OpenAsync();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }
@@ -186,7 +193,7 @@ namespace refactor_this.Repositories
             }
         }
 
-        public void Update(Product product)
+        public async Task UpdateAsync(Product product)
         {
             try
             {
@@ -194,7 +201,7 @@ namespace refactor_this.Repositories
 
                 using (var conn = Helpers.NewConnection())
                 {
-                    string sql = "UPDATE product SET name = @Name, description = @Description, price = @Price, deliveryprice = @DeliveryPrice WHERE id = @Id";
+                    const string sql = "UPDATE product SET name = @Name, description = @Description, price = @Price, deliveryprice = @DeliveryPrice WHERE id = @Id";
 
                     using (var cmd = new SqlCommand(sql, conn))
                     {
@@ -203,8 +210,8 @@ namespace refactor_this.Repositories
                         cmd.Parameters.AddWithValue("@Description", product.Description ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@Price", product.Price);
                         cmd.Parameters.AddWithValue("@DeliveryPrice", product.DeliveryPrice);
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
+                        await conn.OpenAsync();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }
@@ -223,7 +230,7 @@ namespace refactor_this.Repositories
             }
         }
 
-        public void Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
             try
             {
@@ -231,8 +238,8 @@ namespace refactor_this.Repositories
                 using (var cmd = new SqlCommand("DELETE FROM product WHERE id = @Id", conn))
                 {
                     cmd.Parameters.AddWithValue("@Id", id);
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
+                    await conn.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
             catch (SqlException ex)

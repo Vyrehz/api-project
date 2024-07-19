@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefactorThis", "RefactorThis\RefactorThis.csproj", "{20AB69F9-F2D3-4A68-96C3-424EC8B9406E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefactorThis.Tests", "RefactorThis.Tests\RefactorThis.Tests.csproj", "{91ED26D1-4C3E-49D4-BBAB-9C0D361894A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +17,15 @@ Global
 		{20AB69F9-F2D3-4A68-96C3-424EC8B9406E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20AB69F9-F2D3-4A68-96C3-424EC8B9406E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20AB69F9-F2D3-4A68-96C3-424EC8B9406E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91ED26D1-4C3E-49D4-BBAB-9C0D361894A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91ED26D1-4C3E-49D4-BBAB-9C0D361894A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91ED26D1-4C3E-49D4-BBAB-9C0D361894A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91ED26D1-4C3E-49D4-BBAB-9C0D361894A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {37A845DF-C268-4ED7-AEA6-9CD39DB19ABF}
 	EndGlobalSection
 EndGlobal

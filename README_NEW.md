@@ -55,4 +55,10 @@
 - Added Upsert function to both services for use in the "Update" endpoint
 - I followed this pattern from the original implementation and made the assumption that Update should also Upsert
 
+## Thirteenth commit
+- Added Unit tests project
+- Added tests for Product only endpoints (excluding options for now)
+- Used async and await operations to provide thread safe functions
+- Allows for scalability by not blocking threads when waiting for I/O operations (database calls etc)
+
 // ToDo: tests
