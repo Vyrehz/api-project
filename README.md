@@ -25,7 +25,7 @@ The API supports CRUD operations for products and product options. Here are some
 To get a local copy up and running follow these simple steps:
 
 1. Clone the repository:
-   git clone https://github.com/Vyrehz/xero-test.git
+   git clone https://github.com/Vyrehz/api-project.git
 2. Restore NuGet packages:
    dotnet restore
 3. Run the application:
@@ -43,9 +43,7 @@ To run the unit tests, navigate to the test project directory and run:
 - Use github actions to add a workflow and automatically run tests on each branch push
 
 ## Commit History
-Whilst developing this project I have been using git to keep track of my changes, here is a link to my repository:
-
-https://github.com/Vyrehz/xero-test/compare/master...feature/ajh-xero-refactoring-take-home-assessment
+Whilst developing this project I have been using git to keep track of my changes.
 
 Below is a more in depth look into my commit history, including my logic and reasoning behind certain implementation details and decisions I made along the way.
 
